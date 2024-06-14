@@ -10,7 +10,7 @@ jobs:
   terraform-apply:
     runs-on: ubuntu-latest
     env:
-      TF_ACTION_WORKING_DIR: terraform
+      TF_ACTION_WORKING_DIR: ./terraform
       AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
       AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
       EXOSCALE_API_KEY: ${{ secrets.EXOSCALE_API_KEY }}
