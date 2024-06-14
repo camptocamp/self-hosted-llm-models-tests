@@ -6,9 +6,6 @@ on:
   schedule:
   - cron: "0 17 * * 1-5" # Run the terraform destroy every workday at 18h UTC
 
-defaults:
-  run:
-    working-directory: ${{ env.TF_WORKING_DIRECTORY }}
 
 jobs:
   terraform-apply:
@@ -16,12 +13,16 @@ jobs:
     env:
       AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
       AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-      AWS_DEFAULT_REGION: ${{ env.AWS_DEFAULT_REGION }}
+      AWS_DEFAULT_REGION: ${{ vars.AWS_DEFAULT_REGION }}
       EXOSCALE_API_KEY: ${{ secrets.EXOSCALE_API_KEY }}
       EXOSCALE_API_SECRET: ${{ secrets.EXOSCALE_API_SECRET }}
       TF_VAR_exoscale_iam_key: ${{ secrets.EXOSCALE_API_KEY }}
       TF_VAR_exoscale_iam_secret: ${{ secrets.EXOSCALE_API_SECRET }}
   
+    defaults:
+      run:
+        working-directory: ${{ vars.TF_WORKING_DIRECTORY }}
+      
     steps:
 
     - name: "Checkout the repository"
