@@ -1,0 +1,10 @@
+apiVersion: v2
+name: nvidia-utilities
+version: 0
+description: 
+  A Helm chart for deploying the NVIDIA utilities on a Kubernetes cluster. This chart is nothing more than an 
+  aggregation of the NVIDIA utilities as dependencies. 
+dependencies:
+  - name: nvidia-device-plugin
+    version: 0.15.0
+    repository: https://nvidia.github.io/k8s-device-plugin

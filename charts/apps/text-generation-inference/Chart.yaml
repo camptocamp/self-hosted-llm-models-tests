@@ -1,0 +1,7 @@
+apiVersion: v2
+name: text-generation-inference
+version: v0.1.0
+appVersion: v2.0.4
+description:
+  A Helm chart for deploying the Hugging Face text-generation-inference app on a Kubernetes cluster.
+

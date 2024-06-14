@@ -1,0 +1,30 @@
+nameOverride: text-generation-inference
+
+fullnameOverride: ""
+
+namespaceOverride: ""
+
+additionalLabels: {}
+
+model:
+  organization: TODO
+  name: TODO
+  huggingface_user: TODO
+  huggingface_token: TODO
+
+image:
+  repository: ghcr.io/huggingface/text-generation-inference
+  tag: latest
+  pullPolicy: IfNotPresent
+
+init:
+  image:
+    repository: TODO
+    tag: latest
+    pullPolicy: IfNotPresent
+  s3:
+    enabled: false
+    bucketURL: s3://TODO
+
+ingress:
+  enabled: false
