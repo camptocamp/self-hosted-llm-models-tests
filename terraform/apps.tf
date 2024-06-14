@@ -1,75 +1,124 @@
-module "helloworld_apps" {
-  source = "git::https://github.com/camptocamp/devops-stack-module-applicationset.git?ref=v3.0.0"
+locals {
+  llm_apps = {
+    app_project_name = "llm-apps"
+    repo_url         = "https://github.com/lentidas/self-hosted-llm-models-tests.git"
+    apps = [for app in [
+      {
+        name      = "nvidia-utilities"
+        namespace = "nvidia-utilities"
+      },
+      # {
+      #   name      = "text-generation-inference"
+      #   namespace = "huggingface-apps"
+      # },
+      # {
+      #   name      = "chat-ui"
+      #   namespace = "huggingface-apps"
+      # },
+      ] : merge(app, {
+        repo_url    = "https://github.com/lentidas/self-hosted-llm-models-tests.git"
+        repo_branch = "main"
+      })
+    ]
+  }
+}
 
-  dependency_ids = {
-    argocd = module.argocd.id
+resource "argocd_project" "llm-apps" {
+  metadata {
+    name      = local.llm_apps.app_project_name
+    namespace = "argocd"
   }
 
-  name                   = "helloworld-apps"
-  project_dest_namespace = "*"
-  project_source_repo    = "https://github.com/camptocamp/devops-stack-helloworld-templates.git"
+  spec {
+    description = "Argo CD project for the LLM applications and dependencies (e.g. NVIDIA Device Plugin)"
 
-  generators = [
-    {
-      git = {
-        repoURL  = "https://github.com/camptocamp/devops-stack-helloworld-templates.git"
-        revision = "main"
+    source_repos = [
+      local.llm_apps.repo_url
+    ]
 
-        directories = [
-          {
-            path = "apps/*"
-          }
-        ]
-      }
-    }
-  ]
-  template = {
-    metadata = {
-      name = "{{path.basename}}"
-    }
-
-    spec = {
-      project = "helloworld-apps"
-
-      source = {
-        repoURL        = "https://github.com/camptocamp/devops-stack-helloworld-templates.git"
-        targetRevision = "main"
-        path           = "{{path}}"
-
-        helm = {
-          valueFiles = []
-          # The following value defines this global variables that will be available to all apps in apps/*
-          # These are needed to generate the ingresses containing the name and base domain of the cluster.
-          values = <<-EOT
-            cluster:
-              name: "${module.sks.cluster_name}"
-              domain: "${module.sks.base_domain}"
-              subdomain: "${local.subdomain}"
-              issuer: "${local.cluster_issuer}"
-            apps:
-              longhorn: true
-              grafana: true
-              prometheus: true
-              thanos: true
-              alertmanager: true
-          EOT
-        }
-      }
-
-      destination = {
+    dynamic "destination" {
+      for_each = concat(
+        [{ namespace = "argocd" }], # The destination for the ApplicationSet that creates all the applications.
+        [for app in local.llm_apps.apps : { namespace = app.namespace }]
+      )
+      content {
         name      = "in-cluster"
-        namespace = "{{path.basename}}"
+        namespace = destination.value["namespace"]
+      }
+    }
+
+    orphaned_resources {
+      warn = true
+    }
+
+    cluster_resource_whitelist {
+      group = "*"
+      kind  = "*"
+    }
+  }
+}
+
+resource "argocd_application_set" "llm-apps" {
+  metadata {
+    name      = local.llm_apps.app_project_name
+    namespace = "argocd"
+  }
+
+  spec {
+    generator {
+      list {
+        elements = local.llm_apps.apps
+      }
+    }
+
+    template {
+      metadata {
+        name      = "{{name}}"
+        namespace = "argocd"
+        labels = {
+          "application-set" = local.llm_apps.app_project_name
+          "application"     = "{{name}}"
+          "cluster"         = "in-cluster"
+          "namespace"       = "{{namespace}}"
+        }
       }
 
-      syncPolicy = {
-        automated = {
-          allowEmpty = false
-          selfHeal   = true
-          prune      = true
+      spec {
+        # Refer to the Argo CD project created above and not the local with the same name in order to create an 
+        # implicit dependency.
+        project = resource.argocd_project.llm-apps.metadata.0.name
+
+        source {
+          repo_url        = "{{repo_url}}"
+          target_revision = "{{repo_branch}}"
+          path            = "charts/apps/{{name}}"
         }
-        syncOptions = [
-          "CreateNamespace=true"
-        ]
+
+        destination {
+          name      = "in-cluster"
+          namespace = "{{namespace}}"
+        }
+
+        sync_policy {
+          automated {
+            prune       = true
+            self_heal   = true
+            allow_empty = true
+          }
+
+          retry {
+            backoff {
+              duration     = "20s"
+              max_duration = "2m"
+              factor       = "2"
+            }
+            limit = "5"
+          }
+
+          sync_options = [
+            "CreateNamespace=true"
+          ]
+        }
       }
     }
   }
