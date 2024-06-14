@@ -1,0 +1,36 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: "{{ .Release.Name }}"
+  labels:
+    app.kubernetes.io/managed-by: "{{ .Release.Service }}"
+    app.kubernetes.io/instance: "{{ .Release.Name }}"
+    helm.sh/chart: "{{ .Chart.Name }}-{{ .Chart.Version }}"
+  annotations:
+    "helm.sh/hook": post-install,post-upgrade
+    "helm.sh/hook-weight": "-5"
+    "helm.sh/hook-delete-policy": hook-succeeded
+spec:
+  template:
+    metadata:
+      name: "{{ .Release.Name }}-test-gpu-workload"
+      labels:
+        app.kubernetes.io/managed-by: "{{ .Release.Service }}"
+        app.kubernetes.io/instance: "{{ .Release.Name }}"
+        helm.sh/chart: "{{ .Chart.Name }}-{{ .Chart.Version }}"
+    spec:
+      restartPolicy: Never
+      containers:
+        - name: cuda-container
+          image: nvcr.io/nvidia/k8s/cuda-sample:vectoradd-cuda10.2
+          resources:
+            limits:
+              nvidia.com/gpu: 1 # requesting 1 GPU
+      {{- with ( index .Values "nvidia-device-plugin" ).tolerations }}
+      tolerations:
+      {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with ( index .Values "nvidia-device-plugin" ).affinity }}
+      affinity:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
