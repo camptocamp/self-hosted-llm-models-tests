@@ -1,0 +1,38 @@
+---
+name: "Scheduled/Manual terraform destroy"
+
+on:
+  workflow_dispatch:
+  schedule:
+  - cron: "0 17 * * 1-5" # Run the terraform destroy every workday at 18h UTC
+
+jobs:
+  terraform-destroy:
+    runs-on: ubuntu-latest
+    env:
+      TF_ACTION_WORKING_DIR: terraform
+      AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+      AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+      EXOSCALE_API_KEY: ${{ secrets.EXOSCALE_API_KEY }}
+      EXOSCALE_API_SECRET: ${{ secrets.EXOSCALE_API_SECRET }}
+      TF_VAR_exoscale_iam_key: ${{ secrets.EXOSCALE_API_KEY }}
+      TF_VAR_exoscale_iam_secret: ${{ secrets.EXOSCALE_API_SECRET }}
+
+    steps:
+
+    - name: "Checkout the repository"
+      uses: actions/checkout@v4
+
+    - name: "Setup Terraform"
+      uses: hashicorp/setup-terraform@v3
+
+    - name: "Run terraform init"
+      id: init
+      run: "terraform init -no-color"
+    
+    - name: "Delete some resources on the state file"
+      run: 'terraform state rm $(terraform-bin state list | grep "argocd_application\|argocd_project\|argocd_cluster\|argocd_repository\|kubernetes_\|helm_")'
+      continue-on-error: true # This is to avoid failed workflows and the consequent noise when the scheduled destroy runs on the days we have not created the test deployment
+
+    - name: "Run terraform destroy"
+      run: "terraform destroy -no-color -auto-approve -input=false"

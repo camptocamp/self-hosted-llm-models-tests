@@ -1,0 +1,111 @@
+---
+name: "Automatic terraform plan on PR"
+
+on:
+  pull_request:
+    branches:
+    - main
+
+jobs:
+  terraform-plan:
+    runs-on: ubuntu-latest
+    env:
+      TF_ACTION_WORKING_DIR: terraform
+      AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+      AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+      EXOSCALE_API_KEY: ${{ secrets.EXOSCALE_API_KEY }}
+      EXOSCALE_API_SECRET: ${{ secrets.EXOSCALE_API_SECRET }}
+      TF_VAR_exoscale_iam_key: ${{ secrets.EXOSCALE_API_KEY }}
+      TF_VAR_exoscale_iam_secret: ${{ secrets.EXOSCALE_API_SECRET }}
+
+    steps:
+
+    - name: "Checkout the repository"
+      uses: actions/checkout@v4
+
+    - name: "Setup Terraform"
+      uses: hashicorp/setup-terraform@v3
+
+    - name: "Run terraform fmt -check"
+      id: fmt
+      run: "terraform fmt -check"
+
+    - name: "Run terraform init"
+      id: init
+      run: "terraform init -no-color"
+    
+    - name: "Run terraform validate"
+      id: validate
+      run: "terraform validate -no-color"
+
+    - name: "Run terraform plan"
+      id: plan
+      run: "terraform plan -no-color -input=false"
+      continue-on-error: true # This is in order to continue even if there is an error so we can get the output
+
+    - name: "Add a comment to the PR with the result of the previous steps"
+      uses: actions/github-script@v7
+      if: github.event_name == 'pull_request'
+      env:
+        VALIDATE: "$ terraform validate\n${{ steps.validate.outputs.stdout }}"
+        PLAN: "$ terraform plan\n${{ steps.plan.outputs.stdout }}"
+      with:
+        github-token: ${{ secrets.GITHUB_TOKEN }}
+        script: |
+          // 1. Retrieve existing bot comments for the PR
+          const { data: comments } = await github.rest.issues.listComments({
+            owner: context.repo.owner,
+            repo: context.repo.repo,
+            issue_number: context.issue.number,
+          })
+          const botComment = comments.find(comment => {
+            return comment.user.type === 'Bot' && comment.body.includes('Terraform format and style:')
+          })
+
+          // 2. Prepare format of the comment
+          const output = `#### Terraform format and style: \`${{ steps.fmt.outcome }}\`
+          #### Terraform initialization: \`${{ steps.init.outcome }}\`
+          #### Terraform validation: \`${{ steps.validate.outcome }}\`
+          
+          <details><summary>Show validation output</summary>
+          
+          \`\`\`\n
+          ${process.env.VALIDATE}
+          \`\`\`
+          
+          </details>
+          
+          #### Terraform plan: \`${{ steps.plan.outcome }}\`
+          
+          <details><summary>Show plan</summary>
+          
+          \`\`\`\n
+          ${process.env.PLAN}
+          \`\`\`
+          
+          </details>
+          
+          *Pushed by: @${{ github.actor }}, Action: \`${{ github.event_name }}\`, Working Directory: \`${{ env.tf_actions_working_dir }}\`, Workflow: \`${{ github.workflow }}\`*`;
+          
+          // 3. If we have a comment, update it, otherwise create a new one
+          if (botComment) {
+            github.rest.issues.updateComment({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              comment_id: botComment.id,
+              body: output
+            })
+          } else {
+            github.rest.issues.createComment({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body: output
+            })
+          }
+
+    # This step is needed so the workflow appears as unsuccessful in the event of a failed terraform plan
+    # We only need this because we used `continue-on-error: true` on the `terraform plan` step
+    - name: "Check that the plan was successful otherwise throw an error and quit"
+      if: steps.plan.outcome == 'failure'
+      run: "exit 1"
