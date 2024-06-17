@@ -26,7 +26,7 @@ global:
 deployment:
   image:
     repository: ghcr.io/huggingface/text-generation-inference
-    tag: v2.0.4
+    tag: sha-96b7b40
     pullPolicy: IfNotPresent
 
   model: meta-llama/Meta-Llama-3-70B-Instruct
