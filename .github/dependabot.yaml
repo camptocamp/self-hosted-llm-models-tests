@@ -12,7 +12,7 @@ updates:
 # DevOps Stack examples
 # TODO Check if we can use a wildcard to include all subfolders in the examples folder
 - package-ecosystem: "terraform"
-  directory: "/" # TODO Add other examples when we are sure everything works
+  directory: "/terraform"
   schedule:
     # Check for updated Terraform modules daily
     interval: "daily"
