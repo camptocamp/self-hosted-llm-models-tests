@@ -7,10 +7,10 @@ locals {
         name      = "nvidia-utilities"
         namespace = "nvidia-utilities"
       },
-      # {
-      #   name      = "text-generation-inference"
-      #   namespace = "huggingface-apps"
-      # },
+      {
+        name      = "text-generation-inference"
+        namespace = "huggingface-apps"
+      },
       # {
       #   name      = "chat-ui"
       #   namespace = "huggingface-apps"
@@ -23,7 +23,15 @@ locals {
   }
 }
 
+resource "null_resource" "llm-apps" {
+  triggers = {
+    argocd = module.argocd.id
+  }
+}
+
 resource "argocd_project" "llm-apps" {
+  depends_on = [null_resource.llm-apps]
+
   metadata {
     name      = local.llm_apps.app_project_name
     namespace = "argocd"
@@ -59,6 +67,8 @@ resource "argocd_project" "llm-apps" {
 }
 
 resource "argocd_application_set" "llm-apps" {
+  depends_on = [null_resource.llm-apps]
+
   metadata {
     name      = local.llm_apps.app_project_name
     namespace = "argocd"
