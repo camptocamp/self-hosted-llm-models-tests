@@ -25,11 +25,11 @@ spec:
           resources:
             limits:
               nvidia.com/gpu: 1 # requesting 1 GPU
-      {{- with ( index .Values "nvidia-device-plugin" ).tolerations }}
-      tolerations:
-      {{- toYaml . | nindent 8 }}
-      {{- end }}
       {{- with ( index .Values "nvidia-device-plugin" ).affinity }}
       affinity:
         {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with ( index .Values "nvidia-device-plugin" ).tolerations }}
+      tolerations:
+        {{- toYaml . | nindent 6 }}
       {{- end }}
