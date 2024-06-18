@@ -14,11 +14,11 @@ Also, for every Exoscale subscription/organization, a support request needs to b
 
 Exoscale provides a simple guide on how to enable GPU support in SKS nodes, available [here](https://community.exoscale.com/documentation/sks/gpu-sks-nodes/).
 
-The Exoscale documentation note that the SKS cluster need to be on the `Pro` plan and not on the `Starter` plan, but I've been able to instantiate the GPU nodes on cluster with the latter.
+The Exoscale documentation note that the SKS cluster needs to be on the `Pro` plan and not on the `Starter` plan, but I've been able to instantiate the GPU nodes on a cluster with the latter.
 
-From what I've gathered, the Exoscale GPU nodes already satisfy the [prerequisites](https://github.com/NVIDIA/k8s-device-plugin?tab=readme-ov-file#prerequisites) for the NVIDIA Device Plugin and we only need to install it. I choose to install it as an Helm chart and configure it through the values, as recommended for production deployments. More information about the NVIDIA utilities/plugins used below or on the README.md in the charts folder.
+From what I've gathered, the Exoscale GPU nodes already satisfy the [prerequisites](https://github.com/NVIDIA/k8s-device-plugin?tab=readme-ov-file#prerequisites) for the NVIDIA Device Plugin and we only need to install it. I choose to install it as an Helm chart and configure it through the values, as recommended for production deployments. More information about the NVIDIA utilities or plugins used will the [README.md in the charts folder](./charts/README.md).
 
-I did not explore all the [configuration possibilities](https://github.com/NVIDIA/k8s-device-plugin?tab=readme-ov-file#configuring-the-nvidia-device-plugin-binary) for the NVIDIA Device Plugin. Of notable interest seems the possibility of sharing a GPU through multiple workloads.
+I did not explore all the [configuration possibilities](https://github.com/NVIDIA/k8s-device-plugin?tab=readme-ov-file#configuring-the-nvidia-device-plugin-binary) for the NVIDIA Device Plugin. Of notable interest seems the possibility of sharing a GPU through multiple workloads (by default, if a pod needs a GPU, it will be exclusively attached to it a not any other pod).
 
 ### Running LLM models using Hugging Face's Text Generation Inference
 
@@ -43,7 +43,7 @@ curl 127.0.0.1:8080/generate_stream \
     -H 'Content-Type: application/json'
 ```
 
-I've not customized the prompt parameters any further than increasing and decreasing the `max_new_tokens` parameter.
+**I've not customized the prompt parameters any further than increasing and decreasing the `max_new_tokens` parameter.**
 
 #### meta-llama/Meta-Llama-3-70B-Instruct
 
