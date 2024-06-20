@@ -1,0 +1,40 @@
+{{- if (index .Values "nvidia-utilities").enabled -}}
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: nvidia-utilities
+  namespace: {{ .Values.argocd.namespace | default "argocd" }}
+  labels:
+    application: nvidia-utilities
+spec:
+  project: {{ .Values.argocd.project | default "llm-apps" }}
+  
+  source:
+    repoURL: https://github.com/lentidas/self-hosted-llm-models-tests.git
+    targetRevision: main
+    path: charts/nvidia-utilities
+    {{- with (index .Values "nvidia-utilities").valuesObject }}
+    valuesObject:
+      {{- toYaml . | nindent 6 }}
+    {{- end }}
+  
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: nvidia-utilities
+
+  syncPolicy:
+    {{- if (index .Values "nvidia-utilities").autoSync }}
+    automated:
+      prune: true
+      selfHeal: true
+      allowEmpty: true
+    {{- end }}
+    syncOptions:
+    - CreateNamespace=true
+    retry:
+      limit: 5
+      backoff:
+        duration: 20s
+        factor: 2
+        maxDuration: 5m
+{{- end -}}
