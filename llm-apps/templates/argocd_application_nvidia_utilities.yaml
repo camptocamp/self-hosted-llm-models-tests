@@ -14,8 +14,9 @@ spec:
     targetRevision: main
     path: charts/nvidia-utilities
     {{- with .Values.nvidiaUtilities.valuesObject }}
-    valuesObject:
-      {{- toYaml . | nindent 6 }}
+    helm:
+      valuesObject:
+        {{- toYaml . | nindent 8 }}
     {{- end }}
   
   destination:
