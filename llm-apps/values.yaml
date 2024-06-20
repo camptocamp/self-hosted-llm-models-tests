@@ -1,8 +1,8 @@
-argocd:
+argoCD:
   project: llm-apps
   namespace: argocd
 
-nvidia-utilities:
+nvidiaUtilities:
   enabled: true
   autoSync: true
   valuesObject:
@@ -22,4 +22,4 @@ nvidia-utilities:
                 values:
                 - llm
 
-personal-environments: []
+personalEnvironments: []

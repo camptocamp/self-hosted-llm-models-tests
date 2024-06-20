@@ -3,17 +3,5 @@
 nvidia-device-plugin:
   
   tolerations: []
-  - key: nodepool
-    operator: Equal
-    value: llm
-    effect: NoSchedule
   
   affinity: {}
-    nodeAffinity:
-      requiredDuringSchedulingIgnoredDuringExecution:
-        nodeSelectorTerms:
-        - matchExpressions:
-          - key: role
-            operator: In
-            values:
-            - llm
