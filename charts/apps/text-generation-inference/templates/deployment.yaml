@@ -23,6 +23,12 @@ spec:
         args:
         - --model-id
         - {{ .Values.deployment.model }}
+        {{- with .Values.deployment.modelOptions }}
+        {{- if .quantize }}
+        - --quantize
+        - {{ .quantize }}
+        {{- end }}
+        {{- end }}
         env:
         - name: PORT
           value: "8080"

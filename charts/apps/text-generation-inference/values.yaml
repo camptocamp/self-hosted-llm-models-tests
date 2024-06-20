@@ -29,13 +29,15 @@ deployment:
     tag: sha-96b7b40
     pullPolicy: IfNotPresent
 
-  model: meta-llama/Meta-Llama-3-8B-Instruct
+  model: meta-llama/Meta-Llama-3-70B-Instruct
+  modelOptions:
+    quantize: bitsandbytes
 
   resources:
     limits:
-      nvidia.com/gpu: 2
+      nvidia.com/gpu: 1
     requests:
-      cpu: 3
+      cpu: 4
       memory: 10Gi
 
   tolerations:
