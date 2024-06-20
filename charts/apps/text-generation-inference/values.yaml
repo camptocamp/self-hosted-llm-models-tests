@@ -29,9 +29,9 @@ deployment:
     tag: sha-96b7b40
     pullPolicy: IfNotPresent
 
-  model: meta-llama/Meta-Llama-3-70B-Instruct
-  modelOptions:
-    quantize: bitsandbytes
+  model: meta-llama/Meta-Llama-3-8B-Instruct
+  # modelOptions:
+  #   quantize: bitsandbytes
 
   resources:
     limits:
