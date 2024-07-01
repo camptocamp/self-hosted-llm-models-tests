@@ -1,6 +1,6 @@
 locals {
   llm_apps = {
-    repo_url = "https://github.com/lentidas/self-hosted-llm-models-tests.git"
+    repo_url = "https://github.com/camptocamp/self-hosted-llm-models-tests.git"
   }
 }
 

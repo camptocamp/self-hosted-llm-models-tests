@@ -10,7 +10,7 @@ spec:
   project: {{ .Values.argoCD.project | default "llm-apps" }}
   
   source:
-    repoURL: https://github.com/lentidas/self-hosted-llm-models-tests.git
+    repoURL: https://github.com/camptocamp/self-hosted-llm-models-charts.git
     targetRevision: main
     path: charts/nvidia-utilities
     {{- with .Values.nvidiaUtilities.valuesObject }}
