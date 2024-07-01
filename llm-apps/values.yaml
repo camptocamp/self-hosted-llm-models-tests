@@ -20,7 +20,7 @@ nvidiaUtilities:
                 failRequestsGreaterThanOne: true
                 resources:
                 - name: nvidia.com/gpu
-                  replicas: 10
+                  replicas: 10 # This means 10 times the amount of GPUs available in the node 
 
       tolerations:
       - key: nodepool
