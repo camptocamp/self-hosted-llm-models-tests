@@ -3,4 +3,4 @@ name: llm-apps
 version: 0
 description: 
   A Helm chart for deploying the core applications required for executing LLM models and also to deploy separate 
-  environments for each engineer separately.
+  environments for each engineer working on the project.

@@ -22,4 +22,4 @@ nvidiaUtilities:
                 values:
                 - llm
 
-personalEnvironments: []
+workEnvironments: []
