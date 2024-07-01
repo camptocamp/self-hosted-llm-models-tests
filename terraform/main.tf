@@ -160,8 +160,8 @@ module "longhorn" {
     bucket_name = resource.aws_s3_bucket.this["longhorn"].id
     region      = resource.aws_s3_bucket.this["longhorn"].region
     endpoint    = "sos-${resource.aws_s3_bucket.this["longhorn"].region}.exo.io"
-    access_key  = resource.exoscale_iam_access_key.s3_iam_key["longhorn"].key
-    secret_key  = resource.exoscale_iam_access_key.s3_iam_key["longhorn"].secret
+    access_key  = resource.exoscale_iam_api_key.s3_iam_api_key["longhorn"].key
+    secret_key  = resource.exoscale_iam_api_key.s3_iam_api_key["longhorn"].secret
   }
 
   dependency_ids = {
@@ -185,8 +185,8 @@ module "loki-stack" {
   logs_storage = {
     bucket_name = resource.aws_s3_bucket.this["loki"].id
     region      = resource.aws_s3_bucket.this["loki"].region
-    access_key  = resource.exoscale_iam_access_key.s3_iam_key["loki"].key
-    secret_key  = resource.exoscale_iam_access_key.s3_iam_key["loki"].secret
+    access_key  = resource.exoscale_iam_api_key.s3_iam_api_key["loki"].key
+    secret_key  = resource.exoscale_iam_api_key.s3_iam_api_key["loki"].secret
   }
 
   dependency_ids = {
@@ -212,8 +212,8 @@ module "thanos" {
   metrics_storage = {
     bucket_name = resource.aws_s3_bucket.this["thanos"].id
     region      = resource.aws_s3_bucket.this["thanos"].region
-    access_key  = resource.exoscale_iam_access_key.s3_iam_key["thanos"].key
-    secret_key  = resource.exoscale_iam_access_key.s3_iam_key["thanos"].secret
+    access_key  = resource.exoscale_iam_api_key.s3_iam_api_key["thanos"].key
+    secret_key  = resource.exoscale_iam_api_key.s3_iam_api_key["thanos"].secret
   }
 
   thanos = {
@@ -245,8 +245,8 @@ module "kube-prometheus-stack" {
   metrics_storage = {
     bucket_name = resource.aws_s3_bucket.this["thanos"].id
     region      = resource.aws_s3_bucket.this["thanos"].region
-    access_key  = resource.exoscale_iam_access_key.s3_iam_key["thanos"].key
-    secret_key  = resource.exoscale_iam_access_key.s3_iam_key["thanos"].secret
+    access_key  = resource.exoscale_iam_api_key.s3_iam_api_key["thanos"].key
+    secret_key  = resource.exoscale_iam_api_key.s3_iam_api_key["thanos"].secret
   }
 
   prometheus = {
