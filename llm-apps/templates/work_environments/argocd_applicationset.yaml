@@ -18,36 +18,36 @@ spec:
   template:
 
     metadata:
-      name: {{ $key }}-{{`{{ .name }}`}}
+      name: {{ $key }}-{{`{{ name }}`}}
       labels:
-        application: {{ $key }}-{{`{{ .name }}`}}
+        application: {{ $key }}-{{`{{ name }}`}}
         applicationset: {{ $key }}-application-set
         engineer: {{ $key }}
 
     spec:
       project: {{ $key }}-apps
       sources:
-      - repoURL: "{{`{{ .values_repo_url }}`}}"
+      - repoURL: "{{`{{ values_repo_url }}`}}"
         targetRevision: main
         ref: values
-      - repoURL: "{{`{{ .chart_repo_url }}`}}"
-        targetRevision: "{{`{{ .target_revision }}`}}"
-        path: "charts/{{`{{ .name }}`}}"
+      - repoURL: "{{`{{ chart_repo_url }}`}}"
+        targetRevision: "{{`{{ target_revision }}`}}"
+        path: "charts/{{`{{ name }}`}}"
         helm:
           valueFiles:
-          - $values/values/{{`{{ .name }}`}}.yaml
+          - $values/values/{{`{{ name }}`}}.yaml
 
       destination:
         name: in-cluster
-        namespace: "{{`{{ .namespace }}`}}"
+        namespace: {{ $key }}-{{`{{ name }}`}}
 
       info:
       - name: Engineer
         value: {{ $key }}
       - name: Chart repository
-        value: "{{`{{ .chart_repo_url }}`}}"
+        value: "{{`{{ chart_repo_url }}`}}"
       - name: Values repository
-        value: "{{`{{ .values_repo_url }}`}}"
+        value: "{{`{{ values_repo_url }}`}}"
 
       syncPolicy:
         {{- if $value.apps.auto_sync }}
