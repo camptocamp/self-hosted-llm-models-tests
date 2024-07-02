@@ -19,14 +19,17 @@ locals {
         first_name = "Gonçalo"
         last_name  = "Heleno"
       }
-      apps = [
-        {
-          name            = "text-generation-inference"
-          target_revision = "main"
-          chart_repo_url  = "https://github.com/camptocamp/self-hosted-llm-models-charts.git"
-          values_repo_url = "https://github.com/lentidas/self-hosted-llm-models-values.git"
-        }
-      ]
+      apps = {
+        autosync = true
+        list = [
+          {
+            name            = "text-generation-inference"
+            target_revision = "main"
+            chart_repo_url  = "https://github.com/camptocamp/self-hosted-llm-models-charts.git"
+            values_repo_url = "https://github.com/lentidas/self-hosted-llm-models-values.git"
+          }
+        ]
+      }
     }
   }
 }

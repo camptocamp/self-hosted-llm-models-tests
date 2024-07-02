@@ -1,0 +1,68 @@
+{{- range $key, $value := .Values.workEnvironments -}}
+---
+apiVersion: argoproj.io/v1alpha1
+kind: ApplicationSet
+metadata:
+  name: {{ $key }}-application-set
+  namespace: {{ $.Values.argoCD.namespace | default "argocd" }}
+  labels:
+    engineer: {{ $key }}
+spec:
+  generators:
+  - list:
+      {{- with $value.apps.list }}
+      elements:
+        {{- toYaml . | nindent 6 }}
+      {{- end }}
+
+  template:
+
+    metadata:
+      name: {{ $key }}-{{`{{ .name }}`}}
+      labels:
+        application: {{ $key }}-{{`{{ .name }}`}}
+        applicationset: {{ $key }}-application-set
+        engineer: {{ $key }}
+
+    spec:
+      project: {{ $key }}-apps
+      sources:
+      - repoURL: "{{`{{ .values_repo_url }}`}}"
+        targetRevision: main
+        ref: values
+      - repoURL: "{{`{{ .chart_repo_url }}`}}"
+        targetRevision: "{{`{{ .target_revision }}`}}"
+        path: "charts/{{`{{ .name }}`}}"
+        helm:
+          valueFiles:
+          - $values/values/{{`{{ .name }}`}}.yaml
+   
+    destination:
+      name: in-cluster
+      namespace: "{{`{{ .namespace }}`}}"
+
+    info:
+    - name: Engineer
+      value: {{ $key }}
+    - name: Chart repository
+      value: "{{`{{ .chart_repo_url }}`}}"
+    - name: Values repository
+      value: "{{`{{ .values_repo_url }}`}}"
+
+    syncPolicy:
+      {{- if $value.apps.auto_sync }}
+      automated:
+        prune: true
+        selfHeal: true
+      {{- end }}
+      syncOptions:
+      - CreateNamespace=true
+
+      retry:
+        limit: 5 # number of failed sync attempt retries; unlimited number of attempts if less than 0
+        backoff:
+          duration: 5s # the amount to back off. Default unit is seconds, but could also be a duration (e.g. "2m", "1h")
+          factor: 2 # a factor to multiply the base duration after each failed retry
+          maxDuration: 3m
+
+{{- end -}}

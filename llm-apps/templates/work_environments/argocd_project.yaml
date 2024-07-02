@@ -11,17 +11,15 @@ spec:
   description: Test environment and applications for {{ $value.name }}
 
   sourceRepos:
-  {{- range $element := $value.apps }}
+  {{- range $element := $value.apps.list }}
     - {{ $element.chart_repo_url }}
     - {{ $element.values_repo_url }}
   {{- end }}
   
-  destination:
-    name: in-cluster
+  destinations:
+  - name: in-cluster
     namespace: "*"
-
-  destination:
-    server: https://kubernetes.default.svc
+  - server: https://kubernetes.default.svc
     namespace: "*"
 
   clusterResourceWhitelist:

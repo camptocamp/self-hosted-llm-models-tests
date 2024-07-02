@@ -22,7 +22,7 @@ resource "argocd_project" "llm-apps" {
   }
 
   spec {
-    description = "Argo CD project for the LLM applications and dependencies (e.g. NVIDIA Device Plugin)"
+    description = "LLM applications and their dependencies (e.g. NVIDIA Device Plugin)"
 
     source_repos = local.llm_apps.source_repos
 
