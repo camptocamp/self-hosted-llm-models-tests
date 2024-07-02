@@ -36,33 +36,33 @@ spec:
         helm:
           valueFiles:
           - $values/values/{{`{{ .name }}`}}.yaml
-   
-    destination:
-      name: in-cluster
-      namespace: "{{`{{ .namespace }}`}}"
 
-    info:
-    - name: Engineer
-      value: {{ $key }}
-    - name: Chart repository
-      value: "{{`{{ .chart_repo_url }}`}}"
-    - name: Values repository
-      value: "{{`{{ .values_repo_url }}`}}"
+      destination:
+        name: in-cluster
+        namespace: "{{`{{ .namespace }}`}}"
 
-    syncPolicy:
-      {{- if $value.apps.auto_sync }}
-      automated:
-        prune: true
-        selfHeal: true
-      {{- end }}
-      syncOptions:
-      - CreateNamespace=true
+      info:
+      - name: Engineer
+        value: {{ $key }}
+      - name: Chart repository
+        value: "{{`{{ .chart_repo_url }}`}}"
+      - name: Values repository
+        value: "{{`{{ .values_repo_url }}`}}"
 
-      retry:
-        limit: 5 # number of failed sync attempt retries; unlimited number of attempts if less than 0
-        backoff:
-          duration: 5s # the amount to back off. Default unit is seconds, but could also be a duration (e.g. "2m", "1h")
-          factor: 2 # a factor to multiply the base duration after each failed retry
-          maxDuration: 3m
+      syncPolicy:
+        {{- if $value.apps.auto_sync }}
+        automated:
+          prune: true
+          selfHeal: true
+        {{- end }}
+        syncOptions:
+        - CreateNamespace=true
+
+        retry:
+          limit: 5 # number of failed sync attempt retries; unlimited number of attempts if less than 0
+          backoff:
+            duration: 5s # the amount to back off. Default unit is seconds, but could also be a duration (e.g. "2m", "1h")
+            factor: 2 # a factor to multiply the base duration after each failed retry
+            maxDuration: 3m
 
 {{- end -}}
