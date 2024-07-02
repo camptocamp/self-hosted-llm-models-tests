@@ -44,14 +44,7 @@ module "oidc" {
 
   create_pool = true
 
-  user_map = {
-    gheleno = {
-      username   = "gheleno"
-      email      = "goncalo.heleno@camptocamp.com"
-      first_name = "Gonçalo"
-      last_name  = "Heleno"
-    }
-  }
+  user_map = { for k, v in local.engineers : k => v.oidc }
 
   callback_urls = [
     format("https://longhorn.%s/oauth2/callback", trimprefix("${local.subdomain}.${local.base_domain}", ".")),

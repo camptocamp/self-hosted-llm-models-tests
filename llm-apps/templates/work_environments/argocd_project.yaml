@@ -1,0 +1,44 @@
+{{- range $key, $value := .Values.workEnvironments -}}
+---
+apiVersion: argoproj.io/v1alpha1
+kind: AppProject
+metadata:
+  name: {{ $key }}-apps
+  namespace: {{ $.Values.argoCD.namespace | default "argocd" }}
+  labels:
+    engineer: {{ $key }}
+spec:
+  description: Test environment and applications for {{ $value.name }}
+
+  sourceRepos:
+  {{- range $element := $value.apps }}
+    - {{ $element.chart_repo_url }}
+    - {{ $element.values_repo_url }}
+  {{- end }}
+  
+  destination:
+    name: in-cluster
+    namespace: "*"
+
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: "*"
+
+  clusterResourceWhitelist:
+  - group: "*"
+    kind: "*"
+  
+  namespaceResourceWhitelist:
+  - group: "*"
+    kind: "*"
+
+  orphanedResources:
+    warn: true
+    ignore:
+    - group: "argoproj.io"
+      kind: "*"
+      name: "*"
+    - kind: "Secret"
+      name: "*"
+
+{{- end -}}

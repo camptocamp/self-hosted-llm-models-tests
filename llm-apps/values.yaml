@@ -38,4 +38,4 @@ nvidiaUtilities:
                 values:
                 - llm
 
-workEnvironments: []
+workEnvironments: {}
