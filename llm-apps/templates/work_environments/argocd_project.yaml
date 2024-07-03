@@ -1,4 +1,5 @@
-{{- range $key, $value := .Values.workEnvironments -}}
+{{- range $key, $value := .Values.workEnvironments }}
+
 ---
 apiVersion: argoproj.io/v1alpha1
 kind: AppProject
@@ -11,10 +12,7 @@ spec:
   description: Test environment and applications for {{ $value.name }}
 
   sourceRepos:
-  {{- range $element := $value.apps.list }}
-    - {{ $element.chart_repo_url }}
-    - {{ $element.values_repo_url }}
-  {{- end }}
+  - "*"
   
   destinations:
   - name: in-cluster
@@ -39,4 +37,4 @@ spec:
     - kind: "Secret"
       name: "*"
 
-{{- end -}}
+{{- end }}

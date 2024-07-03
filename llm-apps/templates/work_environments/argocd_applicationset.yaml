@@ -1,4 +1,6 @@
-{{- range $key, $value := .Values.workEnvironments -}}
+{{- range $key, $value := .Values.workEnvironments }}
+{{- if $value.apps }}
+
 ---
 apiVersion: argoproj.io/v1alpha1
 kind: ApplicationSet
@@ -7,6 +9,7 @@ metadata:
   namespace: {{ $.Values.argoCD.namespace | default "argocd" }}
   labels:
     engineer: {{ $key }}
+
 spec:
   generators:
   - list:
@@ -65,4 +68,5 @@ spec:
             factor: 2 # a factor to multiply the base duration after each failed retry
             maxDuration: 3m
 
-{{- end -}}
+{{- end }}
+{{- end }}
