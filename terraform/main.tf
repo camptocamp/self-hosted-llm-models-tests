@@ -1,6 +1,5 @@
 module "sks" {
   source = "git::https://github.com/camptocamp/devops-stack-module-cluster-sks.git?ref=v1.2.0"
-  # source = "../../devops-stack-module-cluster-sks"
 
   cluster_name       = local.cluster_name
   kubernetes_version = local.kubernetes_version
@@ -35,8 +34,9 @@ module "sks" {
 }
 
 module "oidc" {
-  source = "git::https://github.com/camptocamp/devops-stack-module-oidc-aws-cognito.git?ref=v1.1.0"
-  # source = "../../devops-stack-module-oidc-aws-cognito"
+  # source = "git::https://github.com/camptocamp/devops-stack-module-oidc-aws-cognito.git?ref=v1.1.0"
+  # TODO Point back to a release when this PR is merged -> https://github.com/camptocamp/devops-stack-module-oidc-aws-cognito/pull/12
+  source = "git::https://github.com/camptocamp/devops-stack-module-oidc-aws-cognito.git?ref=fix/ignore_schema_changes"
 
   cluster_name = module.sks.cluster_name
   base_domain  = module.sks.base_domain
@@ -54,7 +54,6 @@ module "oidc" {
 
 module "argocd_bootstrap" {
   source = "git::https://github.com/camptocamp/devops-stack-module-argocd.git//bootstrap?ref=v5.2.0"
-  # source = "../../devops-stack-module-argocd/bootstrap"
 
   argocd_projects = {
     "${module.sks.cluster_name}" = {
@@ -90,7 +89,6 @@ module "argocd_bootstrap" {
 
 module "traefik" {
   source = "git::https://github.com/camptocamp/devops-stack-module-traefik.git//sks?ref=v6.3.0"
-  # source = "../../devops-stack-module-traefik/sks"
 
   argocd_project = module.sks.cluster_name
 
@@ -108,7 +106,6 @@ module "traefik" {
 
 module "cert-manager" {
   source = "git::https://github.com/camptocamp/devops-stack-module-cert-manager.git//sks?ref=v8.3.0"
-  # source = "../../devops-stack-module-cert-manager/sks"
 
   argocd_project = module.sks.cluster_name
 
@@ -124,7 +121,6 @@ module "cert-manager" {
 
 module "longhorn" {
   source = "git::https://github.com/camptocamp/devops-stack-module-longhorn.git?ref=v3.6.0"
-  # source = "../../devops-stack-module-longhorn"
 
   cluster_name   = module.sks.cluster_name
   base_domain    = module.sks.base_domain
@@ -167,7 +163,6 @@ module "longhorn" {
 
 module "loki-stack" {
   source = "git::https://github.com/camptocamp/devops-stack-module-loki-stack.git//sks?ref=v8.1.0"
-  # source = "../../devops-stack-module-loki-stack/sks"
 
   argocd_project = module.sks.cluster_name
 
@@ -190,7 +185,6 @@ module "loki-stack" {
 
 module "thanos" {
   source = "git::https://github.com/camptocamp/devops-stack-module-thanos.git//sks?ref=v5.0.0"
-  # source = "../../devops-stack-module-thanos/sks"
 
   cluster_name   = module.sks.cluster_name
   base_domain    = module.sks.base_domain
@@ -224,7 +218,6 @@ module "thanos" {
 
 module "kube-prometheus-stack" {
   source = "git::https://github.com/camptocamp/devops-stack-module-kube-prometheus-stack.git//sks?ref=v11.1.1"
-  # source = "../../devops-stack-module-kube-prometheus-stack/sks"
 
   cluster_name   = module.sks.cluster_name
   base_domain    = module.sks.base_domain
@@ -265,7 +258,6 @@ module "kube-prometheus-stack" {
 
 module "argocd" {
   source = "git::https://github.com/camptocamp/devops-stack-module-argocd.git?ref=v5.2.0"
-  # source = "../../devops-stack-module-argocd"
 
   cluster_name   = module.sks.cluster_name
   base_domain    = module.sks.base_domain
