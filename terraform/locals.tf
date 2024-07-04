@@ -20,21 +20,21 @@ locals {
         last_name  = "Heleno"
       }
       apps = {
-        auto_sync = true
-        list = [
-          {
-            name            = "text-generation-inference"
-            target_revision = "main"
-            chart_repo_url  = "https://github.com/camptocamp/self-hosted-llm-models-charts.git"
-            values_repo_url = "https://github.com/lentidas/self-hosted-llm-models-values.git"
-          },
-          # {
-          #   name            = "chat-ui"
-          #   target_revision = "main"
-          #   chart_repo_url  = "https://github.com/camptocamp/self-hosted-llm-models-charts.git"
-          #   values_repo_url = "https://github.com/lentidas/self-hosted-llm-models-values.git"
-          # }
-        ]
+        #  auto_sync = true
+        #  list = [
+        #    {
+        #      name            = "text-generation-inference"
+        #      target_revision = "main"
+        #      chart_repo_url  = "https://github.com/camptocamp/self-hosted-llm-models-charts.git"
+        #      values_repo_url = "https://github.com/lentidas/self-hosted-llm-models-values.git"
+        #    },
+        #    # {
+        #    #   name            = "chat-ui"
+        #    #   target_revision = "main"
+        #    #   chart_repo_url  = "https://github.com/camptocamp/self-hosted-llm-models-charts.git"
+        #    #   values_repo_url = "https://github.com/lentidas/self-hosted-llm-models-values.git"
+        #    # }
+        #  ]
       }
     }
     bquartier = {
@@ -53,7 +53,17 @@ locals {
         first_name = "Christopher"
         last_name  = "Hornberger"
       }
-      apps = {}
+      apps = {
+        auto_sync = true
+        list = [
+          {
+            name            = "llama-cpp"
+            target_revision = "chr-patch-1"
+            chart_repo_url  = "https://github.com/camptocamp/self-hosted-llm-models-charts.git"
+            values_repo_url = "https://github.com/chornberger-c2c/self-hosted-llm-models-values.git"
+          },
+        ]
+      }
     }
   }
 }
