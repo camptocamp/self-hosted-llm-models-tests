@@ -58,7 +58,7 @@ locals {
         list = [
           {
             name            = "llama-cpp"
-            target_revision = "chr-patch-1"
+            target_revision = "main"
             chart_repo_url  = "https://github.com/camptocamp/self-hosted-llm-models-charts.git"
             values_repo_url = "https://github.com/chornberger-c2c/self-hosted-llm-models-values.git"
           },
