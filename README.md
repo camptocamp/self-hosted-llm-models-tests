@@ -396,9 +396,11 @@ curl http://localhost:8080/completion \
      --data '{"prompt":"What is Deep Learning?", "n_predict": 128}' \
      --header 'Content-Type: application/json'
 
-# with OpenAI API specification (see https://github.com/openai/openai-openapi/blob/master/openapi.yaml)
+# with OpenAI API specification 
+# see https://github.com/openai/openai-openapi/blob/master/openapi.yaml
 curl http://localhost:8080/v1/chat/completions \
-     --data '{"messages": [{"role": "system", "content": "You are a helpful assistant."}, {"role": "user", "content": "Who won the soccer world cup in 2018?"}]}' \ 
+     --data '{"messages": [{"role": "system", "content": "You are a helpful assistant."},
+             {"role": "user", "content": "Who won the soccer world cup in 2018?"}]}' \ 
      --header 'Content-Type: application/json'
 
 # check health
