@@ -380,10 +380,30 @@ Stream closed EOF for huggingface-apps/text-generation-inference-67869c9b65-6j2p
 
 ### Running models with [llama.cpp](https://github.com/ggerganov/llama.cpp/tree/master)
 
+LLama.cpp has been implemented by this [chart](https://github.com/camptocamp/self-hosted-llm-models-charts/tree/main/charts/llama-cpp).
+
+There is also a distinct repository for the [values](https://github.com/chornberger-c2c/self-hosted-llm-models-values).
+
+The container provides its own web service endpoint where we can interact with prompts.
+
+Currently you need to port-forward to the deployment, as the service and ingress objects will be implemented together with authentication at a later stage.
+
 #### Interacting with the [API](https://github.com/ggerganov/llama.cpp/blob/master/examples/server/README.md#api-endpoints)
 
 ```bash
+# generate answer by providing a prompt
 curl http://localhost:8080/completion \
     -d '{"prompt":"What is Deep Learning?", "n_predict": 128}' \
     -H 'Content-Type: application/json'
+
+# with OpenAI API specification (see https://github.com/openai/openai-openapi/blob/master/openapi.yaml)
+curl http://localhost:8080/v1/chat/completions \
+    -d '{"messages": [{"role": "system", "content": "You are a helpful assistant."}, {"role": "user", "content": "Who won the soccer world cup in 2018?"}]}' \ 
+    -H 'Content-Type: application/json'
+
+# check health
+curl http://localhost:8080/health
+
+# read metrics
+curl http://localhost:8080/metrics
 ```
