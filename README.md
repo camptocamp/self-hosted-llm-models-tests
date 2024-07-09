@@ -377,3 +377,13 @@ Special tokens have been added in the vocabulary, make sure the associated word 
 Error: ShardCannotStart
 Stream closed EOF for huggingface-apps/text-generation-inference-67869c9b65-6j2px (text-generation-inference)
 ```
+
+### Running models with [llama.cpp](https://github.com/ggerganov/llama.cpp/tree/master)
+
+#### Interacting with the [API](https://github.com/ggerganov/llama.cpp/blob/master/examples/server/README.md#api-endpoints)
+
+```bash
+curl http://localhost:8080/completion \
+    -d '{"prompt":"What is Deep Learning?", "n_predict": 128}' \
+    -H 'Content-Type: application/json'
+```
