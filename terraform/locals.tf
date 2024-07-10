@@ -3,9 +3,9 @@ locals {
   cluster_name             = "llm-models-sks" # Must be unique for each DevOps Stack deployment in a single account.
   zone                     = "de-fra-1"
   service_level            = "starter"
-  base_domain              = "is-sandbox-exo.camptocamp.com"
+  base_domain              = "is-ai.camptocamp.com"
   subdomain                = ""
-  activate_wildcard_record = false
+  activate_wildcard_record = true
   cluster_issuer           = module.cert-manager.cluster_issuers.production
   letsencrypt_issuer_email = "letsencrypt@camptocamp.com"
   enable_service_monitor   = false # Can be enabled after the first bootstrap.

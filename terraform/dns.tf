@@ -1,8 +1,5 @@
 # Requires a subscription to Exoscale DNS service, which should be mannually activated on the web console.
-# If using nip.io, which is deployed automatically, both these resources are not needed.
 
-# Since the is-sandbox-exo.camptocamp.com domain was added manually to the sandbox account for everyone, we use a `data`
-# instead of `resource` to avoid conflicts.
 data "exoscale_domain" "domain" {
   name = local.base_domain
 }
