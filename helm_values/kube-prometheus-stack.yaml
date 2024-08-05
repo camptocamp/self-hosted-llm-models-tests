@@ -1,0 +1,4 @@
+kube-prometheus-stack:
+  grafana:
+    plugins:
+      - grafana-llm-app
