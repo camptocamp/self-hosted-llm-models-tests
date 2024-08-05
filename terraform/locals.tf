@@ -1,5 +1,5 @@
 locals {
-  kubernetes_version       = "1.30.2"
+  kubernetes_version       = "1.30.3"
   cluster_name             = "llm-models-sks" # Must be unique for each DevOps Stack deployment in a single account.
   zone                     = "de-fra-1"
   service_level            = "starter"
