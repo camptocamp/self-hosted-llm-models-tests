@@ -16,6 +16,6 @@ output "cluster_issuers" {
 
 output "grafana_admin_password" {
   description = "The admin password for Grafana."
-  value       = module.grafana.grafana_admin_password
+  value       = module.kube-prometheus-stack.grafana_admin_password
   sensitive   = true
 }
