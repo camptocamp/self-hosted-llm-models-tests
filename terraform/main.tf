@@ -245,6 +245,11 @@ module "kube-prometheus-stack" {
     oidc = module.oidc.oidc
   }
 
+  helm_values = [
+    yamldecode(file("${path.module}/helm_values/kube-prometheus-stack.yaml")),
+    var.prometheus_helm_values_override
+  ]
+
   dependency_ids = {
     argocd = module.argocd_bootstrap.id
     # secrets      = module.secrets.id

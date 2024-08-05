@@ -9,3 +9,9 @@ variable "exoscale_iam_secret" {
   type        = string
   sensitive   = true
 }
+
+variable "prometheus_helm_values_override" {
+  description = "Override values for prometheus helm chart."
+  type        = any
+  default     = {}
+}
