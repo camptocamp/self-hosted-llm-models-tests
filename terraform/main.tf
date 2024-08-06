@@ -162,11 +162,10 @@ module "longhorn" {
 }
 
 module "loki-stack" {
-  source = "git::https://github.com/camptocamp/devops-stack-module-loki-stack.git//sks?ref=v8.1.0"
+  # source = "git::https://github.com/camptocamp/devops-stack-module-loki-stack.git//sks?ref=v8.1.0"
+  source = "git::https://github.com/camptocamp/devops-stack-module-loki-stack.git//sks?ref=ISDEVOPS-307" # TODO Point back to a release when this PR is merged -> https://github.com/camptocamp/devops-stack-module-loki-stack/pull/119
 
   argocd_project = module.sks.cluster_name
-
-  cluster_id = module.sks.cluster_id
 
   app_autosync = local.app_autosync
 
@@ -184,13 +183,13 @@ module "loki-stack" {
 }
 
 module "thanos" {
-  source = "git::https://github.com/camptocamp/devops-stack-module-thanos.git//sks?ref=v5.0.0"
+  # source = "git::https://github.com/camptocamp/devops-stack-module-thanos.git//sks?ref=v5.0.0"
+  source = "git::https://github.com/camptocamp/devops-stack-module-thanos.git//sks?ref=ISDEVOPS-307" # TODO Point back to a release when this PR is merged -> https://github.com/camptocamp/devops-stack-module-thanos/pull/86
 
   cluster_name   = module.sks.cluster_name
   base_domain    = module.sks.base_domain
   subdomain      = local.subdomain
   cluster_issuer = local.cluster_issuer
-  cluster_id     = module.sks.cluster_id
   argocd_project = module.sks.cluster_name
 
   app_autosync           = local.app_autosync
