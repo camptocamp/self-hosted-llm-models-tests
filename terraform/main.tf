@@ -165,6 +165,8 @@ module "loki-stack" {
   # source = "git::https://github.com/camptocamp/devops-stack-module-loki-stack.git//sks?ref=v8.1.0"
   source = "git::https://github.com/camptocamp/devops-stack-module-loki-stack.git//sks?ref=ISDEVOPS-307" # TODO Point back to a release when this PR is merged -> https://github.com/camptocamp/devops-stack-module-loki-stack/pull/119
 
+  target_revision = "v8.1.0" # TODO Remove this line when Loki Stack module is fixed from the errors of the v8.2.0 release
+
   argocd_project = module.sks.cluster_name
 
   app_autosync = local.app_autosync
