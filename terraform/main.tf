@@ -18,7 +18,7 @@ module "sks" {
       disk_size       = 400
     },
     "${local.cluster_name}-llm" = {
-      size            = 1
+      size            = 2
       instance_type   = "gpu3.small"
       description     = "GPU3 node pool for ${local.cluster_name} for LLM deployment."
       instance_prefix = "llm"
@@ -53,7 +53,7 @@ module "oidc" {
 }
 
 module "argocd_bootstrap" {
-  source = "git::https://github.com/camptocamp/devops-stack-module-argocd.git//bootstrap?ref=v5.3.0"
+  source = "git::https://github.com/camptocamp/devops-stack-module-argocd.git//bootstrap?ref=v5.4.0"
 
   argocd_projects = {
     "${module.sks.cluster_name}" = {
@@ -165,8 +165,6 @@ module "loki-stack" {
   # source = "git::https://github.com/camptocamp/devops-stack-module-loki-stack.git//sks?ref=v8.1.0"
   source = "git::https://github.com/camptocamp/devops-stack-module-loki-stack.git//sks?ref=ISDEVOPS-307" # TODO Point back to a release when this PR is merged -> https://github.com/camptocamp/devops-stack-module-loki-stack/pull/119
 
-  target_revision = "v8.1.0" # TODO Remove this line when Loki Stack module is fixed from the errors of the v8.2.0 release
-
   argocd_project = module.sks.cluster_name
 
   app_autosync = local.app_autosync
@@ -263,7 +261,7 @@ module "kube-prometheus-stack" {
 }
 
 module "argocd" {
-  source = "git::https://github.com/camptocamp/devops-stack-module-argocd.git?ref=v5.3.0"
+  source = "git::https://github.com/camptocamp/devops-stack-module-argocd.git?ref=v5.4.0"
 
   cluster_name   = module.sks.cluster_name
   base_domain    = module.sks.base_domain
