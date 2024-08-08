@@ -87,3 +87,7 @@ locals {
     }
   }]
 }
+resource "random_string" "oauth2_cookie_secret" {
+  length  = 32
+  special = false
+}
