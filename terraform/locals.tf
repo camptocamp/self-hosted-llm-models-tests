@@ -54,15 +54,15 @@ locals {
         last_name  = "Hornberger"
       }
       apps = {
-        auto_sync = true
-        list = [
-          {
-            name            = "llama-cpp"
-            target_revision = "main"
-            chart_repo_url  = "https://github.com/camptocamp/self-hosted-llm-models-charts.git"
-            values_repo_url = "https://github.com/chornberger-c2c/self-hosted-llm-models-values.git"
-          },
-        ]
+        # auto_sync = true
+        # list = [
+        #   {
+        #     name            = "llama-cpp"
+        #     target_revision = "main"
+        #     chart_repo_url  = "https://github.com/camptocamp/self-hosted-llm-models-charts.git"
+        #     values_repo_url = "https://github.com/chornberger-c2c/self-hosted-llm-models-values.git"
+        #   },
+        # ]
       }
     }
   }

@@ -18,7 +18,7 @@ module "sks" {
       disk_size       = 400
     },
     "${local.cluster_name}-llm" = {
-      size            = 2
+      size            = 1
       instance_type   = "gpu3.small"
       description     = "GPU3 node pool for ${local.cluster_name} for LLM deployment."
       instance_prefix = "llm"
