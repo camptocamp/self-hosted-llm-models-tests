@@ -7,6 +7,8 @@ module "sks" {
   base_domain        = data.exoscale_domain.domain.name
   subdomain          = local.subdomain
 
+  cni = "calico"
+
   service_level = local.service_level
 
   nodepools = {
