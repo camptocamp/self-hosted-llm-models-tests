@@ -1,5 +1,5 @@
 module "sks" {
-  source = "git::https://github.com/camptocamp/devops-stack-module-cluster-sks.git?ref=v1.2.0"
+  source = "git::https://github.com/camptocamp/devops-stack-module-cluster-sks.git?ref=v1.2.1"
 
   cluster_name       = local.cluster_name
   kubernetes_version = local.kubernetes_version
@@ -36,9 +36,7 @@ module "sks" {
 }
 
 module "oidc" {
-  # source = "git::https://github.com/camptocamp/devops-stack-module-oidc-aws-cognito.git?ref=v1.1.0"
-  # TODO Point back to a release when this PR is merged -> https://github.com/camptocamp/devops-stack-module-oidc-aws-cognito/pull/12
-  source = "git::https://github.com/camptocamp/devops-stack-module-oidc-aws-cognito.git?ref=fix/ignore_schema_changes"
+  source = "git::https://github.com/camptocamp/devops-stack-module-oidc-aws-cognito.git?ref=v1.1.1"
 
   cluster_name = module.sks.cluster_name
   base_domain  = module.sks.base_domain
@@ -164,8 +162,7 @@ module "longhorn" {
 }
 
 module "loki-stack" {
-  # source = "git::https://github.com/camptocamp/devops-stack-module-loki-stack.git//sks?ref=v8.1.0"
-  source = "git::https://github.com/camptocamp/devops-stack-module-loki-stack.git//sks?ref=ISDEVOPS-307" # TODO Point back to a release when this PR is merged -> https://github.com/camptocamp/devops-stack-module-loki-stack/pull/119
+  source = "git::https://github.com/camptocamp/devops-stack-module-loki-stack.git//sks?ref=v9.0.0"
 
   argocd_project = module.sks.cluster_name
 
@@ -185,8 +182,7 @@ module "loki-stack" {
 }
 
 module "thanos" {
-  # source = "git::https://github.com/camptocamp/devops-stack-module-thanos.git//sks?ref=v5.0.0"
-  source = "git::https://github.com/camptocamp/devops-stack-module-thanos.git//sks?ref=ISDEVOPS-307" # TODO Point back to a release when this PR is merged -> https://github.com/camptocamp/devops-stack-module-thanos/pull/86
+  source = "git::https://github.com/camptocamp/devops-stack-module-thanos.git//sks?ref=v6.0.0"
 
   cluster_name   = module.sks.cluster_name
   base_domain    = module.sks.base_domain
