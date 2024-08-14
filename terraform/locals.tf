@@ -68,26 +68,4 @@ locals {
       }
     }
   }
-  helm_values = [{
-    oidc = var.oidc != null ? {
-      oauth2_proxy_image      = "quay.io/oauth2-proxy/oauth2-proxy:v7.6.0"
-      issuer_url              = var.oidc.issuer_url
-      redirect_url            = format("https://%s/oauth2/callback", local.domain_full)
-      client_id               = var.oidc.client_id
-      client_secret           = var.oidc.client_secret
-      cookie_secret           = resource.random_string.oauth2_cookie_secret.result
-      oauth2_proxy_extra_args = var.oidc.oauth2_proxy_extra_args
-    } : null
-    ingress = {
-      enabled = var.enable_dashboard_ingress
-      hosts = [
-        local.domain,
-        local.domain_full
-      ]
-    }
-  }]
-}
-resource "random_string" "oauth2_cookie_secret" {
-  length  = 32
-  special = false
 }
