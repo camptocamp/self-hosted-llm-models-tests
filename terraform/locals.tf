@@ -30,12 +30,12 @@ locals {
             chart_repo_url  = "https://github.com/camptocamp/self-hosted-llm-models-charts.git"
             values_repo_url = "https://github.com/lentidas/self-hosted-llm-models-values.git"
           },
-          # {
-          #   name            = "chat-ui"
-          #   target_revision = "main"
-          #   chart_repo_url  = "https://github.com/camptocamp/self-hosted-llm-models-charts.git"
-          #   values_repo_url = "https://github.com/lentidas/self-hosted-llm-models-values.git"
-          # }
+          {
+            name            = "chat-ui"
+            target_revision = "main"
+            chart_repo_url  = "https://github.com/camptocamp/self-hosted-llm-models-charts.git"
+            values_repo_url = "https://github.com/lentidas/self-hosted-llm-models-values.git"
+          }
         ]
       }
     }
