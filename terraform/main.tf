@@ -7,8 +7,6 @@ module "sks" {
   base_domain        = data.exoscale_domain.domain.name
   subdomain          = local.subdomain
 
-  cni = "calico"
-
   service_level = local.service_level
 
   nodepools = {
@@ -63,29 +61,6 @@ module "argocd_bootstrap" {
 
   depends_on = [module.sks]
 }
-
-# module "secrets" {
-#   # source = "git::https://github.com/lentidas/devops-stack-module-secrets.git//aws_secrets_manager?ref=feat/initial_implementation"
-#   source = "../../devops-stack-module-secrets/aws_secrets_manager"
-#   # source = "../../devops-stack-module-secrets/k8s_secrets"
-
-#   target_revision = "feat/initial_implementation"
-
-#   cluster_name   = module.sks.cluster_name
-#   base_domain    = module.sks.base_domain
-#   argocd_project = module.sks.cluster_name
-
-#   app_autosync           = local.app_autosync
-#   enable_service_monitor = local.enable_service_monitor
-
-#   aws_iam_access_key = {
-#     create_iam_access_key = true
-#   }
-
-#   dependency_ids = {
-#     argocd = module.argocd_bootstrap.id
-#   }
-# }
 
 module "traefik" {
   source = "git::https://github.com/camptocamp/devops-stack-module-traefik.git//sks?ref=v8.2.0"
@@ -201,7 +176,8 @@ module "thanos" {
   }
 
   thanos = {
-    oidc = module.oidc.oidc
+    oidc                       = module.oidc.oidc
+    compactor_persistence_size = "100Gi"
   }
 
   dependency_ids = {
@@ -221,7 +197,6 @@ module "kube-prometheus-stack" {
   subdomain      = local.subdomain
   cluster_issuer = local.cluster_issuer
   argocd_project = module.sks.cluster_name
-  # secrets_names  = module.secrets.secrets_names
 
   app_autosync = local.app_autosync
 
@@ -248,8 +223,7 @@ module "kube-prometheus-stack" {
   ]
 
   dependency_ids = {
-    argocd = module.argocd_bootstrap.id
-    # secrets      = module.secrets.id
+    argocd       = module.argocd_bootstrap.id
     traefik      = module.traefik.id
     cert-manager = module.cert-manager.id
     oidc         = module.oidc.id
