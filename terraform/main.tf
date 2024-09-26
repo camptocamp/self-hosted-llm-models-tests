@@ -9,6 +9,8 @@ module "sks" {
 
   service_level = local.service_level
 
+  cni = "calico"
+
   nodepools = {
     "${local.cluster_name}-default" = {
       size            = 3
