@@ -17,7 +17,8 @@ jobs:
       EXOSCALE_API_SECRET: ${{ secrets.EXOSCALE_API_SECRET }}
       TF_VAR_exoscale_iam_key: ${{ secrets.EXOSCALE_API_KEY }}
       TF_VAR_exoscale_iam_secret: ${{ secrets.EXOSCALE_API_SECRET }}
-  
+      TF_VAR_gheleno_hf_token: ${{ secrets.GHELENO_HF_TOKEN }}
+
     defaults:
       run:
         working-directory: ${{ vars.TF_WORKING_DIRECTORY }}

@@ -35,6 +35,12 @@ locals {
             target_revision = "main"
             chart_repo_url  = "https://github.com/camptocamp/self-hosted-llm-models-charts.git"
             values_repo_url = "https://github.com/lentidas/self-hosted-llm-models-values.git"
+          },
+          {
+            name            = "llama-cpp"
+            target_revision = "main"
+            chart_repo_url  = "https://github.com/camptocamp/self-hosted-llm-models-charts.git"
+            values_repo_url = "https://github.com/lentidas/self-hosted-llm-models-values.git"
           }
         ]
       }

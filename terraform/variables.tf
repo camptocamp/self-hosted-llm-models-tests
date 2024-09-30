@@ -15,3 +15,9 @@ variable "prometheus_helm_values_override" {
   type        = any
   default     = {}
 }
+
+variable "gheleno_hf_token" {
+  description = "Hugging Face API token to use for the Text Generation Inference and ChatUI services."
+  type        = string
+  sensitive   = true
+}

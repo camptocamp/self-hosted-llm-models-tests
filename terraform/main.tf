@@ -49,6 +49,8 @@ module "oidc" {
   callback_urls = [
     format("https://longhorn.%s/oauth2/callback", trimprefix("${local.subdomain}.${local.base_domain}", ".")),
     format("https://longhorn.%s.%s/oauth2/callback", trimprefix("${local.subdomain}.${local.cluster_name}", "."), local.base_domain),
+    format("https://chat-ui.%s/login/callback", trimprefix("${local.subdomain}.${local.base_domain}", ".")),
+    format("https://chat-ui.%s.%s/login/callback", trimprefix("${local.subdomain}.${local.cluster_name}", "."), local.base_domain),
   ]
 }
 
