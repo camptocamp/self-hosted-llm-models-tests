@@ -1,40 +1,68 @@
 # self-hosted-llm-models-tests
 
-## Notes
+This README contains the techincal notes that resulted from our work and investigations on the deployment of LLM models on Kubernetes in SKS clusters from Exoscale. It is meant to be a repository of the knowledge acquired during our work and as a starting point for future work.
 
-### GPU nodes
+## GPU nodes
 
 For running an LLM model on Kubernetes, we need nodes with a GPU installed.
 
-On Exoscale, the more powerful GPUs available are the [GPU3 Instances](https://www.exoscale.com/pricing/#gpu3-instances). **These are only available on the `de-fra-1` region.**
+On Exoscale, the more powerful GPUs available are the [GPU3 Instances](https://www.exoscale.com/pricing/#gpu3-instances), which run NVIDIA A40 GPUs. 
 
-Also, for every Exoscale subscription/organization, a support request needs to be made to allow the creation of these types of instances.
+> [!NOTE]
+> The GPU3 instances are only available on the `de-fra-1` region.
+>
+> The `large` and `huge` instances are only available on a dedicated hypervisor and we have not tested them.
+
+> [!IMPORTANT]
+> For every Exoscale subscription/organization, a support request needs to be made to allow the creation of these types of instances.
 
 ### Adding support for GPU workloads on Kubernetes
 
 Exoscale provides a simple guide on how to enable GPU support in SKS nodes, available [here](https://community.exoscale.com/documentation/sks/gpu-sks-nodes/).
 
-The Exoscale documentation note that the SKS cluster needs to be on the `Pro` plan and not on the `Starter` plan, but I've been able to instantiate the GPU nodes on a cluster with the latter.
+> [!NOTE]
+> The Exoscale documentation note that the SKS cluster needs to be on the `Pro` plan and not on the `Starter` plan, but we've been able to instantiate the GPU nodes on a cluster with the latter.
 
-From what I've gathered, the Exoscale GPU nodes already satisfy the [prerequisites](https://github.com/NVIDIA/k8s-device-plugin?tab=readme-ov-file#prerequisites) for the NVIDIA Device Plugin and we only need to install it. I choose to install it as an Helm chart and configure it through the values, as recommended for production deployments. More information about the NVIDIA utilities or plugins used will the [README.md in the charts folder](./charts/README.md).
+From what we've gathered, the Exoscale GPU nodes already satisfy the [prerequisites](https://github.com/NVIDIA/k8s-device-plugin?tab=readme-ov-file#prerequisites) for the NVIDIA Device Plugin and we only need to install it.
 
-I did not explore all the [configuration possibilities](https://github.com/NVIDIA/k8s-device-plugin?tab=readme-ov-file#configuring-the-nvidia-device-plugin-binary) for the NVIDIA Device Plugin. Of notable interest seems the possibility of sharing a GPU through multiple workloads (by default, if a pod needs a GPU, it will be exclusively attached to it a not any other pod).
+We choose to install it as an Helm chart and configure it through the chart values, as recommended for production deployments. More information about the NVIDIA utilities or plugins used will be in the README.md in the [respective charts folder](https://github.com/camptocamp/self-hosted-llm-models-charts/tree/main/charts/nvidia-utilities).
 
-### Running LLM models using Hugging Face's Text Generation Inference
+We did not explore all the [configuration possibilities](https://github.com/NVIDIA/k8s-device-plugin?tab=readme-ov-file#configuring-the-nvidia-device-plugin-binary) for the NVIDIA Device Plugin.
 
-I've created a simple chart [here](./charts/apps/text-generation-inference/) that deploys Hugging Face's Text Generation Inference on a Kubernetes cluster. The [`values.yaml`](./charts/apps/text-generation-inference/values.yaml) is already configured to schedule the deployment on the GPU nodepool created by [this Terraform](./terraform/main.tf) code.
+> [!NOTE]
+> We played a bit with the possibility of sharing a GPU through multiple workloads (by default, if a pod needs a GPU, it will be exclusively attached to it a not any other pod), but the performance implications resulting from that configuration were not tested.
 
-I've also added an ApplicationSet to automatically deploy the NVIDIA Device Plugin and the Text Generation Inference deployment, which is also added by Terraform [here](./terraform/apps.tf). However, to access the model, note that you need to add a Kubernetes secret containing your Hugging Face token to give you access to the model. You can use a command similar to the following (**adapt it depending on your deployment and local environment**):
+## Running LLM models
 
-```shell
-kubectl --kubeconfig ~/.kube/is-sandbox-exo-gh-llm-sks-cluster.config -n huggingface-apps create secret generic huggingface-token --from-literal token=YOUR-TOKEN-HERE
-```
+### General deployment architecture
 
-### Tested models
+> [!IMPORTANT]
+> You might question further how the charts for this test cluster are deployed and organized. We expect this section contains the answers you are looking for.
 
-#### meta-llama/Meta-Llama-3-8B-Instruct
+The Terraform code for this cluster creates an Argo CD project and Application called `llm-apps`. The code for this creation is in [this file](https://github.com/camptocamp/self-hosted-llm-models-tests/blob/main/terraform/llm_apps.tf) and the Argo CD Application is just the deployment from [this chart](https://github.com/camptocamp/self-hosted-llm-models-tests/tree/main/llm-apps) contained in this repository.
 
-Using TGI, running this model was quite easy. I've tested its functionality by port-forwarding directly to the pod created by [this chart](./charts/apps/text-generation-inference) and then running a command like the following:
+That chart itself then contains Kubernetes manifests that will create the [Argo CD Application for the NVIDIA Utilities](https://github.com/camptocamp/self-hosted-llm-models-tests/blob/main/llm-apps/templates/argocd_application_nvidia_utilities.yaml) but most importantly the manifests for creating an Argo CD project and ApplicationSet for each engineer that worked on the project. These manifests are found [here](https://github.com/camptocamp/self-hosted-llm-models-tests/tree/main/llm-apps/templates/work_environments) and the list of engineers is obtained from the local variable `engineers` found [here](https://github.com/camptocamp/self-hosted-llm-models-tests/tree/main/terraform/locals.tf).
+
+For each engineer's application, we then obtain the common chart from [this repository](https://github.com/camptocamp/self-hosted-llm-models-charts) but the engineer then must provide a repository with the respective personal values for each chart. For example, this is @lentidas's [repository](https://github.com/lentidas/self-hosted-llm-models-values).
+
+### Hugging Face's Text Generation Inference
+
+#### Deployment
+
+We've created a simple chart [here](https://github.com/camptocamp/self-hosted-llm-models-charts/tree/main/charts/text-generation-inference) that deploys Hugging Face's Text Generation Inference on a Kubernetes cluster.
+
+> [!IMPORTANT]
+> When accessing gated models, you need a Huggging Face token to access them. This can be manually added with the following command:
+> ```shell
+> kubectl --kubeconfig ~/.kube/is-sandbox-exo-gh-llm-sks-cluster.config -n huggingface-apps create secret generic huggingface-token --from-literal token=YOUR-TOKEN-HERE
+> ```
+
+> [!NOTE]
+> For this deployment in particular, these secrets are created by [this Terraform code](https://github.com/camptocamp/self-hosted-llm-models-tests/tree/main/terraform/secrets.tf).
+
+#### Interacting with the deployed LLM model
+
+We've tested its functionality by port-forwarding directly to the pod created by the chart and then running a command like the following:
 
 ```shell
 curl 127.0.0.1:8080/generate_stream \
@@ -43,13 +71,58 @@ curl 127.0.0.1:8080/generate_stream \
     -H 'Content-Type: application/json'
 ```
 
-**I've not customized the prompt parameters any further than increasing and decreasing the `max_new_tokens` parameter.**
+**We've not customized the prompt parameters any further than increasing and decreasing the `max_new_tokens` parameter.**
 
-#### meta-llama/Meta-Llama-3-70B-Instruct
+Later, we will also interacted with the model through Chat UI.
 
-Even with the GPU3 medium instances from Exoscale, I'm unable to run this model. From what I've gathered, the limiting factor seems to be the GPU memory which is not enough. I did not find a way to maybe decrease the memory requirements by decreasing the precision of the model...
+### [llama.cpp](https://github.com/ggerganov/llama.cpp/tree/master)
 
-For reference, here are the logs from the pod:
+#### Deployment
+
+LLama.cpp has been implemented by this [chart](https://github.com/camptocamp/self-hosted-llm-models-charts/tree/main/charts/llama-cpp).
+
+The [image](https://github.com/camptocamp/self-hosted-llm-models-charts/blob/main/charts/llama-cpp/values.yaml#L12-L15) provides its own web service endpoint where we can interact with prompts, not only programmatically but with any browser.
+
+Currently you need to port-forward to the pod, as the service and ingress objects will be implemented together with authentication at a later stage.
+
+#### Interacting with the [API](https://github.com/ggerganov/llama.cpp/blob/master/examples/server/README.md#api-endpoints)
+
+```shell
+# generate answer by providing a prompt
+curl http://localhost:8080/completion \
+     --data '{"prompt":"What is Deep Learning?", "n_predict": 128}' \
+     --header 'Content-Type: application/json'
+
+# with OpenAI API specification 
+# see https://github.com/openai/openai-openapi/blob/master/openapi.yaml
+curl http://localhost:8080/v1/chat/completions \
+     --data '{"messages": [{"role": "system", "content": "You are a helpful assistant."},
+             {"role": "user", "content": "Who won the soccer world cup in 2018?"}]}' \ 
+     --header 'Content-Type: application/json'
+
+# check health
+curl http://localhost:8080/health
+
+# read metrics
+curl http://localhost:8080/metrics
+```
+
+### Tested models
+
+#### meta-llama/Meta-Llama-3.1-8B-Instruct
+
+Using TGI and Llama.cpp we were able to deploy this model quite easily and then interact with it through `curl` commands.
+
+> [!IMPORTANT]
+> Each deployment required a GPU for it to work. We were able to run both simultaneously using 2 `small` or 1 `medium` GPU3 node. More powerful CPUs might be able to run both models simultaneously.
+
+#### meta-llama/Meta-Llama-3.1-70B-Instruct
+
+Even with the GPU3 `medium` instances from Exoscale, we were unable to run this model. From what we've gathered, the limiting factor seems to be the insufficient GPU memory.
+
+A possible solution that we've not tested yet might be to reduce the model's precision by quantizing it.
+
+For reference, here are the logs from the TGI pod:
 
 ```
 stream logs failed container "text-generation-inference" in pod "text-generation-inference-67869c9b65-6j2px" is waiting to start: ContainerCreating for huggingface-apps/text-generation-inference-67869c9b65-6j2px (text-generation-inference)
@@ -378,34 +451,16 @@ Error: ShardCannotStart
 Stream closed EOF for huggingface-apps/text-generation-inference-67869c9b65-6j2px (text-generation-inference)
 ```
 
-### Running models with [llama.cpp](https://github.com/ggerganov/llama.cpp/tree/master)
+## Monitoring
 
-LLama.cpp has been implemented by this [chart](https://github.com/camptocamp/self-hosted-llm-models-charts/tree/main/charts/llama-cpp).
+### Monitoring the GPUs
 
-There is also a distinct repository for the [values](https://github.com/chornberger-c2c/self-hosted-llm-models-values).
+We've deployed the NVIDIA DCGM Exporter to gather metrics from the GPU and export them to Prometheus. We were then able to check them in a Grafana dashboard like the screenshot below.
 
-The [image](https://github.com/camptocamp/self-hosted-llm-models-charts/blob/main/charts/llama-cpp/values.yaml#L12-L15) provides its own web service endpoint where we can interact with prompts, not only programmatically but with any browser.
+![NVIDIA DCGM dashboard](./images/nvidia-dcgm-dashboard.png)
 
-Currently you need to port-forward to the pod, as the service and ingress objects will be implemented together with authentication at a later stage.
+### Monitoring the model
 
-#### Interacting with the [API](https://github.com/ggerganov/llama.cpp/blob/master/examples/server/README.md#api-endpoints)
+Both Llama.cpp and TGI export metrics that allow us to monitor the model performance. Below, you will find a screenshot of the respective Grafana dashboard.
 
-```bash
-# generate answer by providing a prompt
-curl http://localhost:8080/completion \
-     --data '{"prompt":"What is Deep Learning?", "n_predict": 128}' \
-     --header 'Content-Type: application/json'
-
-# with OpenAI API specification 
-# see https://github.com/openai/openai-openapi/blob/master/openapi.yaml
-curl http://localhost:8080/v1/chat/completions \
-     --data '{"messages": [{"role": "system", "content": "You are a helpful assistant."},
-             {"role": "user", "content": "Who won the soccer world cup in 2018?"}]}' \ 
-     --header 'Content-Type: application/json'
-
-# check health
-curl http://localhost:8080/health
-
-# read metrics
-curl http://localhost:8080/metrics
-```
+![TGI Dashboard](./images/tgi_dashboard.png)
