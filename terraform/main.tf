@@ -19,19 +19,19 @@ module "sks" {
       instance_prefix = "default"
       disk_size       = 400
     },
-    # "${local.cluster_name}-llm" = {
-    #   size            = 1
-    #   instance_type   = "gpu3.small"
-    #   description     = "GPU3 node pool for ${local.cluster_name} for LLM deployment."
-    #   instance_prefix = "llm"
-    #   disk_size       = 400
-    #   labels = {
-    #     "role" = "llm"
-    #   }
-    #   taints = {
-    #     nodepool = "llm:NoSchedule"
-    #   }
-    # },
+    "${local.cluster_name}-llm" = {
+      size            = 1
+      instance_type   = "gpu3.small"
+      description     = "GPU3 node pool for ${local.cluster_name} for LLM deployment."
+      instance_prefix = "llm"
+      disk_size       = 400
+      labels = {
+        "role" = "llm"
+      }
+      taints = {
+        nodepool = "llm:NoSchedule"
+      }
+    },
   }
 }
 
